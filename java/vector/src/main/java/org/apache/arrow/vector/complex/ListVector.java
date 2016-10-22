@@ -140,7 +140,7 @@ public class ListVector extends BaseRepeatedValueVector implements FieldVector {
 
   @Override
   public TransferPair getTransferPair(String ref, BufferAllocator allocator, CallBack callBack) {
-    return null;
+    return new TransferImpl(ref, allocator, callBack);
   }
 
   @Override

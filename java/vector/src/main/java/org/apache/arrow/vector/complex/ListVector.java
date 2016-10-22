@@ -84,6 +84,8 @@ public class ListVector extends BaseRepeatedValueVector implements FieldVector {
     if (!addOrGetVector.isCreated()) {
       throw new IllegalArgumentException("Child vector already existed: " + addOrGetVector.getVector());
     }
+
+    addOrGetVector.getVector().initializeChildrenFromFields(field.getChildren());
   }
 
   @Override

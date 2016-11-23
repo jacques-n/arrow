@@ -258,12 +258,6 @@ public class UnionVector implements FieldVector {
     return new TransferImpl((UnionVector) target);
   }
 
-  public void transferTo(org.apache.arrow.vector.complex.UnionVector target) {
-    typeVector.makeTransferPair(target.typeVector).transfer();
-    internalMap.makeTransferPair(target.internalMap).transfer();
-    target.valueCount = valueCount;
-  }
-
   public void copyFrom(int inIndex, int outIndex, UnionVector from) {
     from.getReader().setPosition(inIndex);
     getWriter().setPosition(outIndex);
@@ -287,20 +281,27 @@ public class UnionVector implements FieldVector {
   }
 
   private class TransferImpl implements TransferPair {
-
-    UnionVector to;
+    private final TransferPair internalMapVectorTransferPair;
+    private final TransferPair typeVectorTransferPair;
+    private final UnionVector to;
 
     public TransferImpl(String name, BufferAllocator allocator, CallBack callBack) {
       to = new UnionVector(name, allocator, callBack);
+      internalMapVectorTransferPair = internalMap.makeTransferPair(to.internalMap);
+      typeVectorTransferPair = typeVector.makeTransferPair(to.typeVector);
     }
 
     public TransferImpl(UnionVector to) {
       this.to = to;
+      internalMapVectorTransferPair = internalMap.makeTransferPair(to.internalMap);
+      typeVectorTransferPair = typeVector.makeTransferPair(to.typeVector);
     }
 
     @Override
     public void transfer() {
-      transferTo(to);
+      internalMapVectorTransferPair.transfer();
+      typeVectorTransferPair.transfer();
+      to.valueCount = valueCount;
     }
 
     @Override
